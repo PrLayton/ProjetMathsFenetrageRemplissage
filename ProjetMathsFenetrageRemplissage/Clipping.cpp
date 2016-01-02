@@ -36,28 +36,27 @@ bool cuts(glm::vec2& s, glm::vec2& ss, glm::vec2& f, glm::vec2& f2) {
 	//Retourne vrai si la droite prolongeant le coté de la fenêtre coupe un segment de la forme
 
 
+
 	return false;
 }
 
 glm::vec2 intersection(const glm::vec2& checkedPointA, const glm::vec2& checkedPointB, const glm::vec2& windowPointA, const glm::vec2& windowPointB) {
 
-	glm::vec2 segShape = checkedPointB;
-	segShape -= checkedPointA;
-
-	glm::vec2 segWindow = windowPointB;
-	segWindow -= windowPointA;
-
-	//Voir Matrices
-
 	glm::mat2x2 matrixD = glm::mat2x2(
-		checkedPointB.x - checkedPointA.x, windowPointA.x - windowPointB.x,
-		checkedPointB.y - checkedPointA.y, windowPointA.y - windowPointB.y
+		checkedPointB.x - checkedPointA.x, -(windowPointB.x - windowPointA.x),
+		checkedPointB.y - checkedPointA.y, -(windowPointB.y - windowPointA.y)
+		);
+
+	glm::vec2 c2 = glm::vec2(
+		windowPointA.x - checkedPointA.x, windowPointA.y - checkedPointA.x
 		);
 
 	float tempDeterminant = glm::determinant(matrixD);
+	glm::vec2 res = glm::vec2(0, 0);
 	if (tempDeterminant != 0) {
 
 		glm::inverse(matrixD);
+		res = glm::inverse(matrixD) * c2;
 	}
 	else {
 		//erreur
@@ -65,13 +64,11 @@ glm::vec2 intersection(const glm::vec2& checkedPointA, const glm::vec2& checkedP
 		return glm::vec2(0, 0);
 	}
 
-	glm::vec2 c2 = glm::vec2(
-		windowPointA.x - checkedPointA.x, windowPointA.y - checkedPointA.x
-		);
+	std::cout << "t : " << res.x << " s : " << res.y << std::endl;
 
-	glm::vec2 res = matrixD * c2;
+	glm::vec2 finalRes = windowPointA + (windowPointB - windowPointA)*res.y;
 
-	std::cout << "t : " << res.x << "s : " << res.y << std::endl;
+	std::cout << "X : " << finalRes.x << " Y : " << finalRes.y << std::endl;
 
 	return res;
 }
